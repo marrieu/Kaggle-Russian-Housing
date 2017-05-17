@@ -1,4 +1,4 @@
-Data from: https://www.kaggle.com/c/sberbank-russian-housing-market/data
+Get data from: https://www.kaggle.com/c/sberbank-russian-housing-market/data
 
 "The aim of this competition is to predict the sale price of each property. The target variable is called price_doc in train.csv.
 
