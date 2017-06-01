@@ -1,12 +1,17 @@
-Kaggle-Russian Housing: Importing data and analysing year
-================
-Maria
-May 19, 2017
+---
+title: "Kaggle-Russian Housing: Importing data and analysing year"
+author: "Maria"
+date: "May 19, 2017"
+output: github_document
+---
 
-Libraries
----------
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-``` r
+## Libraries
+
+```{r,message=FALSE}
 library(data.table)
 library(tidyverse) #ggplot %>%
 library(lubridate)
@@ -15,61 +20,54 @@ library(corrplot) #corrplot
 #library(DT)
 ```
 
-Importing data
---------------
+## Importing data
 
-``` r
+```{r}
 dtrain <- read.csv('/Applications/R/Russian Bank/train.csv', stringsAsFactors=TRUE)
 dtest <- read.csv('/Applications/R/Russian Bank/test.csv', stringsAsFactors=TRUE)
 dmacro <- read.csv('/Applications/R/Russian Bank/macro.csv', stringsAsFactors=TRUE)
 ```
 
-Combining train and test for analysis
--------------------------------------
+## Combining train and test for analysis 
 
 Creating variable `price_doc` to combine datasets
-
-``` r
+```{r}
 dtest$price_doc<-NA
 ```
 
 Creating `test` indicator
-
-``` r
+```{r}
 dtest$test<-1
 dtrain$test<-0
 ```
 
 Combining data sets
-
-``` r
+```{r}
 dtotal<-rbind(dtrain,dtest)
 ```
 
-Date variable
--------------
+
+## Date variable
 
 Changing format
 
-``` r
+```{r}
 dtotal$timestamp<-as.Date(dtotal$timestamp)
 ```
 
 Creating variables year and month
-
-``` r
+```{r}
 dtotal$year<-year(dtotal$timestamp)
 dtotal$month<-month(dtotal$timestamp)
 dtotal$yearmonth<-ifelse(dtotal$month<10,paste0(dtotal$year,0,dtotal$month),paste0(dtotal$year,dtotal$month))
 dtotal$yearmonth<-as.numeric(dtotal$yearmonth)
+
 ```
 
-Year analysis
--------------
+## Year analysis
 
 Year distribution
-
-``` r
+```{r}
 ggplot(data=dtotal,aes(x=year,fill=as.factor(test)))+
   geom_bar()+
   scale_fill_hue(l=40, c=35)+
@@ -77,25 +75,23 @@ ggplot(data=dtotal,aes(x=year,fill=as.factor(test)))+
   theme_minimal()
 ```
 
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-8-1.png)
-
 We can see that the test dataset only contain years 2015 and 2016
 
 ### Box plot
 
-``` r
+
+```{r,warning=FALSE}
 ggplot(data=dtotal,aes(x=year,y=price_doc,group=as.factor(year)))+
   geom_boxplot(color="darkred")+
   scale_y_continuous(labels = dollar)+
   labs(x="Year",y="Price",title="Box Plot: Price per Year")+
   theme_minimal()
+  
 ```
-
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 ### Is price increasing with years?
 
-``` r
+```{r}
 dtotal[!is.na(dtotal$price_doc),] %>% 
   group_by(year) %>% 
   summarize(mean_build_price=mean(price_doc)) %>%
@@ -105,15 +101,13 @@ dtotal[!is.na(dtotal$price_doc),] %>%
   scale_y_continuous(labels = dollar)+
   labs(x="Year",y="Mean Price",title="Price per Year relationship")+
   theme_minimal()
-```
 
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-10-1.png)
+```
 
 There is obliviously an increase on price with years
 
 ### Is price increasing with year+month?
-
-``` r
+```{r}
 dtotal[!is.na(dtotal$price_doc),] %>% 
   group_by(yearmonth) %>% 
   summarize(mean_build_price=mean(price_doc)) %>%
@@ -126,13 +120,11 @@ dtotal[!is.na(dtotal$price_doc),] %>%
   theme(axis.text.x=element_text(angle=90, hjust=1)) # hjust adjust the text to the graph
 ```
 
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-11-1.png)
-
 There is probably some 'yearmonth' outliers where the price is extremely high or extremely low compared to the natural tendency.
 
 ### Is price seasonal?
 
-``` r
+```{r}
 dtotal[!is.na(dtotal$price_doc),] %>% 
   group_by(year,month) %>% 
   summarize(mean_build_price=mean(price_doc)) %>%
@@ -143,13 +135,12 @@ dtotal[!is.na(dtotal$price_doc),] %>%
   scale_x_continuous(breaks=c(1:12))+
   scale_y_continuous(labels = dollar)+
   theme_minimal()
-```
 
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-12-1.png)
+```
 
 ### Are housings getting bigger?
 
-``` r
+```{r}
 dtotal %>% 
   group_by(year) %>% 
   summarize(mean_full_sq=mean(full_sq)) %>%
@@ -159,15 +150,15 @@ dtotal %>%
   scale_y_continuous(labels = dollar)+
   labs(x="Year",y="Mean size",title="Average size per year")+
   theme_minimal()
-```
 
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-13-1.png)
+```
 
 It seems so..
 
 ### Type of product per year
 
-``` r
+
+```{r}
 ggplot(data=dtotal,aes(x=year,fill=product_type))+
   geom_bar(position = "dodge")+
   scale_fill_hue(l=40, c=35)+
@@ -175,4 +166,3 @@ ggplot(data=dtotal,aes(x=year,fill=product_type))+
   theme_minimal()
 ```
 
-![](1-Kaggle-Russian_Housing_-_Importing_data_and_analysing_year__files/figure-markdown_github/unnamed-chunk-14-1.png)
