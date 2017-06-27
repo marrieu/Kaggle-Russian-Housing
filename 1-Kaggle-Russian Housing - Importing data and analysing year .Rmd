@@ -107,6 +107,7 @@ dtotal[!is.na(dtotal$price_doc),] %>%
 There is obliviously an increase on price with years
 
 ### Is price increasing with year+month?
+
 ```{r}
 dtotal[!is.na(dtotal$price_doc),] %>% 
   group_by(yearmonth) %>% 
