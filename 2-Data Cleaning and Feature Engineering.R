@@ -2,9 +2,6 @@
 ####### Libraries and Importing datasets
 ######################################
 
-# microsoft professional program data science 
-
-
 library(data.table)
 library(tidyverse) #ggplot %>% sample_n
 library(lubridate) #year /month
